@@ -42,14 +42,12 @@ import hashlib
 import subprocess
 from multiprocessing import cpu_count
 from multiprocessing.dummy import Pool, Lock
-from os.path import dirname, join
+from os.path import abspath, dirname, join
 
 HASH_FILE = 'cythonize.dat'
 DEFAULT_ROOT = '.'
-
-print('AAAAAAAAAAAAAAAAAAAAAAAAA')
-print(sys.argv)
-sys.exit()
+ROOT_DIR = sys.argv[1]
+OUT_PATH = abspath(dirname(sys.argv[3]))
 
 # WindowsError is not defined on unix systems
 try:
@@ -66,7 +64,7 @@ def process_pyx(fromfile, tofile, cwd):
         from distutils.version import LooseVersion
 
         # Try to find pyproject.toml
-        pyproject_toml = join(dirname(__file__), '..', 'pyproject.toml')
+        pyproject_toml = join(dirname(__file__), '..', '..', 'pyproject.toml')
         if not os.path.exists(pyproject_toml):
             raise ImportError()
 
@@ -215,11 +213,11 @@ def get_cython_dependencies(fullfrompath):
                 deps.add(os.path.join(fullfromdir, m.group(1) + '.pxd'))
     return list(deps)
 
-def process(path, fromfile, tofile, processor_function, hash_db,
+def process(path, path_out, fromfile, tofile, processor_function, hash_db,
             dep_hashes, lock):
     with lock:
         fullfrompath = os.path.join(path, fromfile)
-        fulltopath = os.path.join(path, tofile)
+        fulltopath = os.path.join(path_out, tofile)
         current_hash = get_hash(fullfrompath, fulltopath)
         if current_hash == hash_db.get(normpath(fullfrompath), None):
             file_changed = False
@@ -244,7 +242,7 @@ def process(path, fromfile, tofile, processor_function, hash_db,
         print('Processing %s' % fullfrompath)
         sys.stdout.flush()
 
-    processor_function(fromfile, tofile, cwd=path)
+    processor_function(fromfile, fulltopath, cwd=path)
 
     with lock:
         # changed target file, recompute hash
@@ -307,7 +305,7 @@ def find_process_files(root_dir):
                             toext = ".cxx"
                     fromfile = filename
                     tofile = filename[:-len(fromext)] + toext
-                    jobs.append((cur_dir, fromfile, tofile, function,
+                    jobs.append((cur_dir, OUT_PATH, fromfile, tofile, function,
                                  hash_db, dep_hashes, lock))
 
     for result in pool.imap_unordered(lambda args: process(*args), jobs):
@@ -318,7 +316,7 @@ def find_process_files(root_dir):
 
 def main():
     try:
-        root_dir = sys.argv[1]
+        root_dir = ROOT_DIR
     except IndexError:
         root_dir = DEFAULT_ROOT
     find_process_files(root_dir)
