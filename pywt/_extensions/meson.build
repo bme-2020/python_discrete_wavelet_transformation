@@ -4,8 +4,15 @@ inc = include_directories('c')
 c99_config =  custom_target('c99_config',
   output : ['_c99_config.py', 'config.pxi'],
   input : '_gen_c99_config.py',
-  command : [py3, '@INPUT@'],
+  command : [py3, '@INPUT@', '@OUTPUT0@', '@OUTPUT1@'],
 )
+
+cythonize =  custom_target('cythonize',
+  output : ['_pywt.c', '_dwt.c', '_cwt.c', '_swt.c'],
+  input : c99_config,
+  command : [py3, '@INPUT@', '@OUTPUT@'],
+)
+
 
 sources = [
   'c/common.c',
@@ -43,45 +50,43 @@ c_sources_all = [
   c99_config[1],
 ]
 
-_pywt_c = custom_target('_pywt',
-  output : '_pywt.c',
-  input : '_pywt.pyx',
-  command : [cython, '@INPUT@', '-o', '@OUTPUT@'],
-)
+#_pywt_c = custom_target('_pywt',
+#  output : '_pywt.c',
+#  input : '_pywt.pyx',
+#  command : [cython, '@INPUT@', '-o', '@OUTPUT@'],
+#)
 
 ext_pywt = py3.extension_module('_pywt',
-  sources : [
-    _pywt_c,
-    c_sources_all],
-  include_directories : inc,
+  sources : cythonize[0],
+#  include_directories : inc,
   dependencies : py3_dep)
 
-_dwt_c = custom_target('_dwt',
-  output : '_dwt.c',
-  input : '_dwt.pyx',
-  command : [cython, '@INPUT@', '-o', '@OUTPUT@'],
-)
+#_dwt_c = custom_target('_dwt',
+#  output : '_dwt.c',
+#  input : '_dwt.pyx',
+#  command : [cython, '@INPUT@', '-o', '@OUTPUT@'],
+#)
 
 ext_dwt = py3.extension_module('_dwt',
-  sources : [_dwt_c, c_sources_all],
+  sources : cythonize[1],
   dependencies : py3_dep)
 
-_cwt_c = custom_target('_cwt',
-  output : '_cwt.c',
-  input : '_cwt.pyx',
-  command : [cython, '@INPUT@', '-o', '@OUTPUT@'],
-)
+#_cwt_c = custom_target('_cwt',
+#  output : '_cwt.c',
+#  input : '_cwt.pyx',
+#  command : [cython, '@INPUT@', '-o', '@OUTPUT@'],
+#)
 
 ext_cwt = py3.extension_module('_cwt',
-  sources : [_cwt_c, c_sources_all],
+  sources : cythonize[2],
   dependencies : py3_dep)
 
-_swt_c = custom_target('_swt',
-  output : '_swt.c',
-  input : '_swt.pyx',
-  command : [cython, '@INPUT@', '-o', '@OUTPUT@'],
-)
+#_swt_c = custom_target('_swt',
+#  output : '_swt.c',
+#  input : '_swt.pyx',
+#  command : [cython, '@INPUT@', '-o', '@OUTPUT@'],
+#)
 
 ext_swt = py3.extension_module('_swt',
-  sources : [_swt_c, c_sources_all],
+  sources : cythonize[3],
   dependencies : py3_dep)
