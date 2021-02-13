@@ -4,6 +4,9 @@ incdir_numpy = run_command(py3,
   check : true
 ).stdout().strip()
 
+# This is a little annoying - we want to install _c99_config.py but
+# not config.pxi. Also we are using the output in the cythonize custom_target
+# to ensure config.pxi gets generated first. This may need a cleanup.
 c99_config = custom_target('c99_config',
   build_by_default : true,
   install : true,

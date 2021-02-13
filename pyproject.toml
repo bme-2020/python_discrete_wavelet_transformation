@@ -43,7 +43,6 @@ requires = [
 [tool.mesonpep517.metadata]
 author = "The PyWavelets Developers"
 author-email = "pywavelets@googlegroups.com"
-maintainer = "The PyWavelets Developers"
 home-page = "https://github.com/PyWavelets/pywt"
 project-urls = [
     "Source, https://github.com/PyWavelets/pywt",
