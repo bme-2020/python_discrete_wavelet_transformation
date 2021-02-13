@@ -5,9 +5,10 @@
 # Do accept micro (bug-fix) releases.
 
 [build-system]
+build-backend = "mesonpep517.buildapi"
 requires = [
-    "wheel",
-    "setuptools",
+    "mesonpep517",
+    "ninja",
     "Cython>=0.29.18",
 
     # NumPy dependencies - to update these, sync from
@@ -37,3 +38,33 @@ requires = [
     "numpy; python_version>='3.10'",
     "numpy; python_version>='3.8' and platform_python_implementation=='PyPy'",
 ]
+
+
+[tool.mesonpep517.metadata]
+author = "The PyWavelets Developers"
+author-email = "pywavelets@googlegroups.com"
+maintainer = "The PyWavelets Developers"
+home-page = "https://github.com/PyWavelets/pywt"
+project-urls = [
+    "Source, https://github.com/PyWavelets/pywt",
+    "Documentation, https://pywavelets.readthedocs.io/",
+]
+summary = "PyWavelets, wavelet transform module"
+description="README.rst"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: C",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"]
+module = "PyWavelets"
