@@ -25,7 +25,7 @@ cythonize = custom_target('cythonize',
   build_by_default : true,
   output : ['_pywt.c', '_dwt.c', '_cwt.c', '_swt.c'],
   input : ['cythonize.py', '.', c99_config[0]],
-  command : [py3, '@INPUT@', '@OUTPUT@'],
+  command : [py3, '@INPUT@', '@OUTPUT@', '-3'],
 )
 
 
@@ -57,40 +57,51 @@ header_templates = [
   'c/wt.template.h',
 ]
 
-c_sources_all = [
-  sources,
-  source_templates,
-  headers,
-  header_templates,
+pxd_files = [
+  'common.pxd',
+  'cwt.pxd',
+  'c_wt.pxd',
+  '_dwt.pxd',
+  '_pywt.pxd',
+  'wavelet.pxd',
+  'wavelets_list.pxi',
+  'config.pxi',
 ]
 
-# TODO: build libc_wt, then use it from extensions
-libc_wt = library('c_wt',
-  sources,
-  c_args : '-DPY_EXTENSION',
+# FIXME: there's still something wrong here, unclear what. Looks like
+# the out-of-tree build somehow causes the declarations in wavelet.pxd
+# protected by HAVE_C99_COMPLEX not to be picked up (get -Wimplicit-declaration
+# warnings, and then errors at runtime)
+libc_wt = static_library('c_wt',
+  [sources, headers],
+  c_args : '-DPY_EXTENSION',  # '-DHAVE_C99_COMPLEX=1'],
   include_directories : incdirs,
   dependencies : [py3_dep, m_dep])
 
 ext_pywt = py3.extension_module('_pywt',
-  sources :[cythonize[0], sources],
+  sources :[cythonize[0], sources, headers],
+  c_args : '-DCYTHON_CCOMPLEX=1',
   include_directories : incdirs,
   dependencies : [py3_dep, m_dep],
   link_with : libc_wt)
 
 ext_dwt = py3.extension_module('_dwt',
-  sources : [cythonize[1], sources],
+  sources : [cythonize[1], sources, headers],
+  c_args : '-DCYTHON_CCOMPLEX=1',
   include_directories : incdirs,
   dependencies : [py3_dep, m_dep],
   link_with : libc_wt)
 
 ext_cwt = py3.extension_module('_cwt',
-  sources : [cythonize[2], sources],
+  sources : [cythonize[2], sources, headers],
+  c_args : '-DCYTHON_CCOMPLEX=1',
   include_directories : incdirs,
   dependencies : [py3_dep, m_dep],
   link_with : libc_wt)
 
 ext_swt = py3.extension_module('_swt',
-  sources : [cythonize[3], sources],
+  sources : [cythonize[3], sources, headers],
+  c_args : '-DCYTHON_CCOMPLEX=1',
   include_directories : incdirs,
   dependencies : [py3_dep, m_dep],
   link_with : libc_wt)
