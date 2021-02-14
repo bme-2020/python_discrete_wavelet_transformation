@@ -18,6 +18,10 @@
 #define _USE_MATH_DEFINES
 #include "math.h"
 
+/* Somehow not being picked up with Meson from include above */
+#define M_PI 3.14159265358979323846264338327950288
+
+
 TYPE CAT(TYPE, _pow)(const TYPE x, const TYPE y)
 {
     if (sizeof(TYPE) == sizeof(double))
