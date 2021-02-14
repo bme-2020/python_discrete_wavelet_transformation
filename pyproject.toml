@@ -40,6 +40,9 @@ requires = [
 ]
 
 
+# Note that with PEP 621 we should be able to do this metadata in a generic
+# way, rather than specific to mesonpep517
+
 [tool.mesonpep517.metadata]
 author = "The PyWavelets Developers"
 author-email = "pywavelets@googlegroups.com"
@@ -65,5 +68,4 @@ classifiers = [
     "Programming Language :: Python :: 3.9",
     "Topic :: Software Development :: Libraries :: Python Modules"
 ]
-platforms = ["Windows", "Linux", "Solaris", "Mac OS-X", "Unix"]
 module = "PyWavelets"
